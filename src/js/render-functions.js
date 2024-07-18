@@ -27,7 +27,7 @@ export function renderGallery(images) {
         </div>`
     )
     .join('');
-  gallery.innerHTML += markup; // додаємо нові зображення до існуючих
+  gallery.innerHTML += markup;
 
   new SimpleLightbox('.photo-card a', {
     captionsData: 'alt',

@@ -30,9 +30,9 @@ async function onSearch(event) {
     return;
   }
 
-  page = 1; // скидаємо номер сторінки для нового пошукового запиту
+  page = 1;
   gallery.innerHTML = '';
-  loadMoreBtn.style.display = 'none'; // ховаємо кнопку під час нового запиту
+  loadMoreBtn.style.display = 'none';
 
   await fetchAndRenderImages();
 }
@@ -56,7 +56,7 @@ async function fetchAndRenderImages() {
     } else {
       renderGallery(data.hits);
       loadMoreBtn.style.display =
-        data.hits.length < data.totalHits ? 'block' : 'none'; // показати/сховати кнопку "Load more"
+        data.hits.length < data.totalHits ? 'block' : 'none';
       if (data.totalHits <= page * 15) {
         iziToast.info({
           title: 'Info',
