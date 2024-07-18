@@ -1,12 +1,23 @@
-const apiKey = '44774243-c5238725a8321193973133c91';
+import axios from 'axios';
 
-export function fetchImages(query) {
-  return fetch(
-    `https://pixabay.com/api/?key=${apiKey}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true`
-  ).then(response => {
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-    return response.json();
-  });
+const apiKey = '44774243-c5238725a8321193973133c91';
+axios.defaults.baseURL = 'https://pixabay.com/api/';
+
+export async function fetchImages(query, page = 1, perPage = 15) {
+  try {
+    const response = await axios.get('', {
+      params: {
+        key: apiKey,
+        q: query,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: true,
+        page: page,
+        per_page: perPage,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }

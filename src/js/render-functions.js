@@ -13,8 +13,8 @@ export function renderGallery(images) {
         views,
         comments,
         downloads,
-      }) => `
-        <div class="photo-card">
+      }) =>
+        `<div class="photo-card">
           <a href="${largeImageURL}">
             <img src="${webformatURL}" alt="${tags}" loading="lazy" />
           </a>
@@ -24,11 +24,10 @@ export function renderGallery(images) {
             <p class="info-item"><b>Comments</b> ${comments}</p>
             <p class="info-item"><b>Downloads</b> ${downloads}</p>
           </div>
-        </div>
-    `
+        </div>`
     )
     .join('');
-  gallery.innerHTML = markup;
+  gallery.innerHTML += markup; // додаємо нові зображення до існуючих
 
   new SimpleLightbox('.photo-card a', {
     captionsData: 'alt',

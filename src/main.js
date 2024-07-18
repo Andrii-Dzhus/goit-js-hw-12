@@ -7,41 +7,81 @@ import './css/styles.css';
 const form = document.querySelector('.search-form');
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
+const loadMoreBtn = document.createElement('button');
+loadMoreBtn.textContent = 'Load more';
+loadMoreBtn.style.display = 'none';
+document.body.appendChild(loadMoreBtn);
+
+let query = '';
+let page = 1;
 
 form.addEventListener('submit', onSearch);
+loadMoreBtn.addEventListener('click', onLoadMore);
 
-function onSearch(event) {
+async function onSearch(event) {
   event.preventDefault();
-  const querty = event.currentTarget.elements.searchQuery.value.toLowerCase();
+  query = event.currentTarget.elements.searchQuery.value.toLowerCase();
 
-  if (querty === '') {
+  if (query === '') {
     iziToast.error({
       title: 'Error',
       message: 'Please enter a search query!',
     });
     return;
   }
-  loader.style.display = 'block';
+
+  page = 1; // скидаємо номер сторінки для нового пошукового запиту
   gallery.innerHTML = '';
-  fetchImages(querty)
-    .then(data => {
-      if (data.hits.length === 0) {
+  loadMoreBtn.style.display = 'none'; // ховаємо кнопку під час нового запиту
+
+  await fetchAndRenderImages();
+}
+
+async function onLoadMore() {
+  page += 1;
+  await fetchAndRenderImages();
+  smoothScroll();
+}
+
+async function fetchAndRenderImages() {
+  loader.style.display = 'block';
+  try {
+    const data = await fetchImages(query, page);
+    if (data.hits.length === 0) {
+      iziToast.info({
+        title: 'Info',
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
+      });
+    } else {
+      renderGallery(data.hits);
+      loadMoreBtn.style.display =
+        data.hits.length < data.totalHits ? 'block' : 'none'; // показати/сховати кнопку "Load more"
+      if (data.totalHits <= page * 15) {
         iziToast.info({
           title: 'Info',
-          message:
-            'Sorry, there are no images matching your search query. Please try again!',
+          message: "We're sorry, but you've reached the end of search results.",
         });
-      } else {
-        renderGallery(data.hits);
+        loadMoreBtn.style.display = 'none';
       }
-    })
-    .catch(error => {
-      iziToast.error({
-        title: 'Error',
-        message: 'Something went wrong: ${error.message}',
-      });
-    })
-    .finally(() => {
-      loader.style.display = 'none';
+    }
+  } catch (error) {
+    iziToast.error({
+      title: 'Error',
+      message: `Something went wrong: ${error.message}`,
     });
+  } finally {
+    loader.style.display = 'none';
+  }
+}
+
+function smoothScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
